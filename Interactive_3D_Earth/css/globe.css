@@ -57,14 +57,14 @@
 
 .globe .globe-list > li {
 	opacity: 1;
-	border: 2px solid #383535;
+
 	position: absolute;
 	margin-left: -49px;
 	margin-top: -9px;
 	width: 14px;
 	height: 14px;
-	border-radius: 50%;
-	background: #ffffff;
+	list-style-image: url('../img/dots.png');
+
 	z-index: 51;
 }
 
@@ -83,7 +83,7 @@
 .globe .globe-list .text {
 	position: absolute;
 	opacity: 1;
-	right: 17px;
+	right: -37px;
 	top: 50%;
 	display: block;
 	font-size: 13px;
@@ -91,39 +91,14 @@
 	font-weight: 600;
 	text-align: right;
 	text-shadow: -1px -1px 0 #000000, 1px -1px 0 #000000, -1px 1px 0 #000000, 1px 1px 0 #000000;
-	color: #fff;
+	color: #3ab9ff;
 	white-space: nowrap;
 	transform: translateY(-50%);
 	width: auto;
 	height: 16px;
-	background-color: #0d0d0d;
 	padding: 2px;
 }
 
-/*countries that have text-box on right side*/
-.Ontario span, .California span, .Carolina span, .Jersey span, .Massachusetts span, .Germany span, .Austria span, .Delaware span, .Switzerland span, .Kingdoms span  {
-	position: relative !important;
-  right: -18px !important;
-  text-align: left !important;
-  float: left !important;
-  top: -19px !important;
-}
-
-.Ontario {
-  width: 26px !important;
-  height: 26px !important;
-  background: #FFF !important;
-}
-
-.Ontario span{
-	font-size: 34px !important;
-  height: 30px !important;
-  line-height: 8px !important;
-  padding: 9px !important;
-  left: 27px !important;
-  top: -13px !important;
-  border-radius: 0px;
-}
 /*------------------------*/
 
 /*---hide globe when screen is too small*/
