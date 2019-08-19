@@ -362,7 +362,7 @@ function checkPinVisibility() {
 		for (var i = 0; i < $(".globe-list li").length; i++) {
 			var cameraToPin = groups.globeDots.geometry.vertices[i].clone().sub(camera.object.position);
 			var index = i + 1;
-			if (cameraToPin.length() > L + 40) {
+			if (cameraToPin.length() > L + 20) {
 				$(".globe-list li:nth-child(" + index + ")").css("display", "none");
 			} else {
 				$(".globe-list li:nth-child(" + index + ")").css("display", "");
