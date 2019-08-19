@@ -90,6 +90,8 @@ function setupScene() {
 		alpha: true,
 		shadowMapEnabled: true
 	});
+	renderer.shadowMap.enabled = true;
+	renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
 
 	renderer.setSize(canvas.clientWidth, canvas.clientHeight);
 	renderer.setPixelRatio(1);
@@ -114,8 +116,15 @@ function setupScene() {
 
 	//add directional light
 	camera.light = new THREE.DirectionalLight(0xffffff, 1);
-	camera.light.position.set(4.1, 30, 18.8);
+	camera.light.position.set(1, 1, 1);
+	camera.light.castShadow = true;            // default false
 	scene.add(camera.light);
+
+	camera.light.shadow.mapSize.width = 512;  // default
+	camera.light.shadow.mapSize.height = 512; // default
+	camera.light.shadow.camera.near = 0.5;       // default
+	camera.light.shadow.camera.far = 500      // default
+
 	// gui.add(camera.light.position, 'y', 0, 20);
 	// gui.add(camera.light.position, 'x', 0, 20);
 	// gui.add(camera.light.position, 'z', 0, 20);
@@ -165,7 +174,7 @@ function addControls() {
 	camera.controls.minDistance = 500;
 	camera.controls.maxDistance = 5000;
 	camera.controls.autoRotate = true; //this is what allows rotation around the globe without DOM element positiong being lost
-	camera.controls.autoRotateSpeed = 0.20;
+	camera.controls.autoRotateSpeed = 1.25;
 	camera.controls.minPolarAngle = Math.PI / 2.5;
 	camera.controls.maxPolarAngle = Math.PI / 2.5;
 }
@@ -262,7 +271,6 @@ function addBody() {
 		function ( gltf ) {
 			gltf.scene.scale.set(50,50,50);
 			globe.add( gltf.scene );
-
 			gltf.animations; // Array<THREE.AnimationClip>
 			gltf.scene; // THREE.Scene
 			gltf.scenes; // Array<THREE.Scene>
@@ -278,9 +286,7 @@ function addBody() {
 		},
 		// called when loading has errors
 		function ( error ) {
-
 			console.log( 'An error happened' );
-
 		}
 	);
 
@@ -295,6 +301,8 @@ function addBody() {
 
 	groups.globe = new THREE.Group();
 	groups.globe.name = 'Body';
+	groups.globe.castShadow = true; //default is false
+	groups.globe.receiveShadow = false; //default
 	groups.globe.add(globe);
 	groups.main.add(groups.globe);
 	addBodyDots();
@@ -333,8 +341,6 @@ function addBodyDots() {
 		var point = new THREE.Vector3(targetX, targetY, targetZ);
 		geometry.vertices.push(point);
 
-		// Add the coordinates to a new array for the intro animation
-  		var result = xyz_from_lat_lng(targetX,targetY,props.globeRadius);
 
 		animations.dots.points.push(new THREE.Vector3(targetX, targetY, targetZ));
 	};
@@ -363,18 +369,24 @@ function checkPinVisibility() {
 		for (var i = 0; i < $(".globe-list li").length; i++) {
 			var cameraToPin = groups.globeDots.geometry.vertices[i].clone().sub(camera.object.position);
 			var index = i + 1;
-			if (cameraToPin.length() - 10 > L && index < 4) {
+			if (cameraToPin.length() -4 > L && index < 4 && index != 2) {
 				$(".globe-list li:nth-child(" + index + ")").css("display", "none");
-			} else if (index < 4) {
+			} else if (index < 4 && index != 2) {
 				$(".globe-list li:nth-child(" + index + ")").css("display", "");
 			}
-			else if (cameraToPin.length() > L + 50 && index == 4) {
+			else if (cameraToPin.length() > L - 15 && index == 2) {
+				$(".globe-list li:nth-child(" + index + ")").css("display", "none");
+			}
+			else if (index == 2) {
+				$(".globe-list li:nth-child(" + index + ")").css("display", "");
+			}
+			else if (cameraToPin.length() > L + 30 && index == 4) {
 				$(".globe-list li:nth-child(" + index + ")").css("display", "none");
 			}
 			else if (index == 4) {
 				$(".globe-list li:nth-child(" + index + ")").css("display", "");
 			}
-			else if (cameraToPin.length() > L + 65 && index == 5) {
+			else if (cameraToPin.length() > L + 50 && index == 5) {
 				$(".globe-list li:nth-child(" + index + ")").css("display", "none");
 			}
 			else {

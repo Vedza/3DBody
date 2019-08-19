@@ -63,7 +63,7 @@
 	margin-top: -9px;
 	width: 14px;
 	height: 14px;
-	/*list-style-image: url('../img/dots.png');*/
+	list-style-image: url('../img/dots.png');
 
 	z-index: 51;
 }

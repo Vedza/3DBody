@@ -3,34 +3,34 @@
     "name": "Menton",
     "posX": "0",
     "posY": "130",
-    "posZ": "35"
+    "posZ": "30"
 
   },
   {
     "name": "Adipomastie",
     "posX": "-20",
     "posY": "70",
-    "posZ": "30"
+    "posZ": "25"
 
   },
   {
     "name": "Ventre",
     "posX": "0",
     "posY": "0",
-    "posZ": "30"
+    "posZ": "25"
   },
   {
     "name": "Cuisses",
     "posX": "-25",
     "posY": "-80",
-    "posZ": "20"
+    "posZ": "15"
 
   },
   {
     "name": "Genoux",
-    "posX": "30",
+    "posX": "40",
     "posY": "-150",
-    "posZ": "10"
+    "posZ": "0"
 
   }
 ]
