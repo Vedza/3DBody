@@ -17,10 +17,10 @@ var mySidenav = document.querySelector("#mySidenav");
 var contentWrapper = document.querySelector("#contentWrapper");
 var navbarButton = document.querySelector("#closeButton");
 
-var countryList = document.querySelector(".countryList");
+var bodypartList = document.querySelector(".bodypartList");
 
 
-// Object for country HTML elements and variables
+// Object for bodypart HTML elements and variables
 var elements = {};
 
 
@@ -29,7 +29,7 @@ var groups = {
 	main: null, // A group containing everything
 	globe: null, // A group containing the globe sphere
 	globeDots: null, // A group containing the globe dots
-	lines: null, // A group containing the lines between each country
+	lines: null, // A group containing the lines between each bodypart
 };
 
 // Map properties for creation and rendering
@@ -99,7 +99,7 @@ function setupScene() {
 	groups.main = new THREE.Group();
 	groups.main.name = 'Main';
 
-	// Group that contains lines for each country
+	// Group that contains lines for each bodypart
 	groups.lines = new THREE.Group();
 	groups.lines.name = 'Lines';
 	groups.main.add(groups.lines);
@@ -128,9 +128,9 @@ function setupScene() {
 	addControls();
 
 	// Render objects
-	addGlobe();
+	addBody();
 
-	//	if (Object.keys(data.countries).length > 0) {
+	//	if (Object.keys(data.bodyparts).length > 0) {
 	//addLines();
 	createListElements();
 
@@ -140,7 +140,7 @@ function setupScene() {
 
 	animate();
 checkScreenSize();
-checkCountryList();
+checkBodyPartList();
 
 
 }
@@ -226,7 +226,7 @@ function animate() {
 }
 
 /* GLOBE */
-function addGlobe() {
+function addBody() {
 	var textureLoader = new THREE.TextureLoader();
 	textureLoader.setCrossOrigin(true);
 	var radius = 0;
@@ -294,15 +294,16 @@ function addGlobe() {
 	globe.add(cloudMesh);
 
 	groups.globe = new THREE.Group();
-	groups.globe.name = 'Globe';
+	groups.globe.name = 'Body';
 	groups.globe.add(globe);
 	groups.main.add(groups.globe);
-	addGlobeDots();
+	addBodyDots();
 }
 
 
-// add country dots to the Earth
-function addGlobeDots() {
+// add bodypart dots to the Earth
+
+function addBodyDots() {
 	var geometry = new THREE.Geometry();
 	var listItem;
 	var listText;
@@ -323,28 +324,28 @@ function addGlobeDots() {
 	texture.needsUpdate = true;
 	var material = new THREE.PointsMaterial({
 		map: texture,
-		size: props.globeRadius / 120
+		size: props.globeRadius / 40
 	});
 
 	var addDot = function(targetX, targetY, targetZ) {
 
 		// Add a point with zero coordinates
-		var point = new THREE.Vector3(0, 0, 0);
+		var point = new THREE.Vector3(targetX, targetY, targetZ);
 		geometry.vertices.push(point);
 
 		// Add the coordinates to a new array for the intro animation
   		var result = xyz_from_lat_lng(targetX,targetY,props.globeRadius);
 
-		animations.dots.points.push(new THREE.Vector3(result.x, result.y, result.z));
+		animations.dots.points.push(new THREE.Vector3(targetX, targetY, targetZ));
 	};
 
-	for (var x = 0; x < allCompanies.length; x++) { //for dots with labels
-		addDot(allCompanies[x].lat, allCompanies[x].lng, allCompanies[x].y);
+	for (var x = 0; x < allBodyPart.length; x++) { //for dots with labels
+		addDot(allBodyPart[x].posX, allBodyPart[x].posY, allBodyPart[x].posZ);
 		listItem = document.createElement("li");
-		listText = document.createTextNode(allCompanies[x].name);
+		listText = document.createTextNode(allBodyPart[x].name);
 		listItem.appendChild(listText);
-		listItem.classList.add("countryListItem");
-		countryList.appendChild(listItem);
+		listItem.classList.add("bodypartListItem");
+		bodypartList.appendChild(listItem);
 	}
 
 	// Add the points to the scene
@@ -358,13 +359,25 @@ function checkPinVisibility() {
 	var earth = groups.globe.children[0].children[1];
 	if (earth !== undefined) {
 		var cameraToEarth = earth.position.clone().sub(camera.object.position);
-		var L = Math.sqrt(Math.pow(cameraToEarth.length(), 2));
+		var L = cameraToEarth.length();
 		for (var i = 0; i < $(".globe-list li").length; i++) {
 			var cameraToPin = groups.globeDots.geometry.vertices[i].clone().sub(camera.object.position);
 			var index = i + 1;
-			if (cameraToPin.length() > L + 20) {
+			if (cameraToPin.length() - 10 > L && index < 4) {
 				$(".globe-list li:nth-child(" + index + ")").css("display", "none");
-			} else {
+			} else if (index < 4) {
+				$(".globe-list li:nth-child(" + index + ")").css("display", "");
+			}
+			else if (cameraToPin.length() > L + 50 && index == 4) {
+				$(".globe-list li:nth-child(" + index + ")").css("display", "none");
+			}
+			else if (index == 4) {
+				$(".globe-list li:nth-child(" + index + ")").css("display", "");
+			}
+			else if (cameraToPin.length() > L + 65 && index == 5) {
+				$(".globe-list li:nth-child(" + index + ")").css("display", "none");
+			}
+			else {
 				$(".globe-list li:nth-child(" + index + ")").css("display", "");
 			}
 		}
@@ -374,12 +387,12 @@ function checkPinVisibility() {
 
 
 
-/* COUNTRY LINES AND DOTS */
+/* bodypart LINES AND DOTS */
 
 // this functions does not draw the curve, but sets the curve properties namely the points which will be drawn
 // animation will be done by updateCurve
 function animatedCurve(e, i) {
-	//no country selected clear all previous entries
+	//no bodypart selected clear all previous entries
 	if (e === null) {
 		groups.lines.children = [];
 		return;
@@ -387,9 +400,9 @@ function animatedCurve(e, i) {
 
 	// Create the geometry
 	var geometry = new THREE.BufferGeometry();
-	// aCountry represent the country that the line is going to start from
-	var aCountry = allCompanies[i];
-	// line mesh represeting aCountry
+	// aBodyPart represent the bodypart that the line is going to start from
+	var aBodyPart = allBodyPart[i];
+	// line mesh represeting aBodyPart
 	var curveObject = null;
 
 	var group = new THREE.Group();
@@ -399,14 +412,12 @@ function animatedCurve(e, i) {
 	var max_height = 0.3 * 50 + 0.05;  // change 0.3 to adjust height of the curve
 	// add controls points so the curve looks smooth
 	for (var i = 0; i < spline_control_points + 1; i++) {
-	    var arc_angle = i * 180.0 / spline_control_points;
-	    var arc_radius = props.globeRadius+ Math.sin(arc_angle * PI180) * max_height;
-	    var latlng = lat_lng_inter_point(e.lat, e.lng, aCountry.lat, aCountry.lng, i / spline_control_points);
-	    var pos = xyz_from_lat_lng(latlng.lat, latlng.lng, arc_radius);
-	    pointsPosition.push(new THREE.Vector3(pos.lat, pos.lng, 0));
+		var arc_angle = i * 180.0 / spline_control_points;
+		var arc_radius = props.globeRadius + Math.sin(arc_angle * PI180) * max_height;
+		//var latlng = lat_lng_inter_point(e.posX, e.posY, aBodyPart.posX, aBodyPart.posY, i / spline_control_points);
+		//var pos = xyz_from_lat_lng(latlng.posX, latlng.posY, arc_radius);
+		pointsPosition.push(new THREE.Vector3(aBodyPart.posX, aBodyPart.posY, 0));
 	}
-
-	var curve= new THREE.CatmullRomCurve3(pointsPosition);
 
 	// Get verticies from curve
 	// 200 indicates that the curve will be repeatedly drawn 200 times; animation works in the way that each time more points are drawn
@@ -443,7 +454,7 @@ function animatedCurve(e, i) {
 function updateCurve() {
 	// turn off event listener so users can't click during animation
     $(".globe-list").off("click");
-    $(".countryList").off("click");
+    $(".bodypartList").off("click");
 	// determine the speed of the animation
 	drawCount += 2;
 	// animate every curve by changing drawCount
@@ -457,8 +468,8 @@ function updateCurve() {
 		drawCount = 0;
 		// put event listener back after animation so users can click them again
       	$(".globe-list").on("click", clickFn);
-      	$(".countryList").on("click", clickFn);
-      	$([$(".globe-canvas"),$(".globe-list"), $(".countryList")]).each(function(){
+      	$(".bodypartList").on("click", clickFn);
+      	$([$(".globe-canvas"),$(".globe-list"), $(".bodypartList")]).each(function(){
 			    $(this).on('click', stopAutoRotation);
 			  });
 		return;
@@ -468,9 +479,9 @@ function updateCurve() {
 
 /* COORDINATE CALCULATIONS */
 // Returns an object of 3D spherical coordinates based on the the latitude and longitude
-function xyz_from_lat_lng(lat, lng, radius) {
-    var phi = (90 - lat) * PI180;
-    var theta = (360 - lng) * PI180;
+function xyz_from_lat_lng(posX, posY, radius) {
+    var phi = (90 - posX) * PI180;
+    var theta = (360 - posY) * PI180;
 
     return {
         x: radius * Math.sin(phi) / 3* Math.cos(theta),
@@ -493,12 +504,12 @@ function lat_lng_inter_point(lat1, lng1, lat2, lng2, offset) {
     var x = A * Math.cos(lat1) * Math.cos(lng1) + B * Math.cos(lat2) * Math.cos(lng2);
     var y = A * Math.cos(lat1) * Math.sin(lng1) + B * Math.cos(lat2) * Math.sin(lng2);
     var z = A * Math.sin(lat1) + B * Math.sin(lat2);
-    var lat = Math.atan2(z, Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2))) * 180 / Math.PI;
-    var lng = Math.atan2(y, x) * 180 / Math.PI;
+    var posX = Math.atan2(z, Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2))) * 180 / Math.PI;
+    var posY = Math.atan2(y, x) * 180 / Math.PI;
 
     return {
-      lat: lat,
-      lng: lng
+      posX: posX,
+      posY: posY
     }
 }
 
@@ -513,11 +524,11 @@ function createListElements() {
 		// Create the element
 		var element = document.createElement('li');
 		var innerContent;
-		//var targetCountry = data.countries[target];
-		var targetCountry = allCompanies[target]; // REPLACEMENT
-		element.innerHTML = '<span class="text">' + targetCountry.name + '</span>'; //country name
-		element.className += targetCountry.name;
-		//element.span.className += targetCountry.name;
+		//var targetBodyPart = data.bodyparts[target];
+		var targetBodyPart = allBodyPart[target]; // REPLACEMENT
+		element.innerHTML = '<span class="text">' + targetBodyPart.name + '</span>'; //bodypart name
+		element.className += targetBodyPart.name;
+		//element.span.className += targetBodyPart.name;
 		var object = {
 			position: coordinates,
 			element: element
@@ -528,9 +539,9 @@ function createListElements() {
 		elements[target] = object;
 	};
 
-	// Loop through each country line
+	// Loop through each bodypart line
 	var i = 0;
-	for (var x = 0; x < allCompanies.length; x++) { //var country in data.countries
+	for (var x = 0; x < allBodyPart.length; x++) { //var bodypart in data.bodyparts
 		var coordinates = groups.globeDots.geometry.vertices[x];
 		pushObject(coordinates, x);
 	}
@@ -595,7 +606,7 @@ function introAnimate() {
 // Returns an object of 2D coordinates for projected 3D position
 function getProjectedPosition(width, height, position) {
 	/*
-		Using the coordinates of a country in the 3D space, this function will
+		Using the coordinates of a bodypart in the 3D space, this function will
 		return the 2D coordinates using the camera projection method.
 	*/
 	position = position.clone();
@@ -606,13 +617,6 @@ function getProjectedPosition(width, height, position) {
 	};
 }
 
-
-
-/*--------------------- end of setup ----------------------------*/
-
-
-
-
 /* -------------------- for click manipulation ---------------------------*/
 
 var clickFn = function(e) {
@@ -621,12 +625,12 @@ var clickFn = function(e) {
     var content = document.getElementById('contentContainer');
 
     // find the object which is being clicked
-    var countryObject;
-    var clickedCountry;
-    for (var i = 0; i < allCompanies.length; i++) {
-      clickedCountry = e.target.innerText;
-      if (clickedCountry  == allCompanies[i].name) {
-        countryObject = allCompanies[i];
+    var bodypartObject;
+    var clickedBodyPart;
+    for (var i = 0; i < allBodyPart.length; i++) {
+      clickedBodyPart = e.target.innerText;
+      if (clickedBodyPart  == allBodyPart[i].name) {
+        bodypartObject = allBodyPart[i];
       }
     }
 
@@ -635,11 +639,11 @@ var clickFn = function(e) {
 
 	//update line mesh
 	if (e.target.innerText == "Ontario") {
-		for (var i = 0; i < allCompanies.length; i++) {
-			animatedCurve(countryObject, i);
+		for (var i = 0; i < allBodyPart.length; i++) {
+			animatedCurve(bodypartObject, i);
 		}
 	} else {
-		animatedCurve(countryObject, 0);
+		animatedCurve(bodypartObject, 0);
 	}
 	// animate line drawing
 	//TODO: maybe put it back
@@ -648,23 +652,23 @@ var clickFn = function(e) {
 
   //update color of the dots being clicked
   $(".globe-list li").each(function(){
-      if ($(this).attr('class') == clickedCountry) {
+      if ($(this).attr('class') == clickedBodyPart) {
         $(this).css("background-color", "#eeff5d")
       } else {
         $(this).css("background-color", "#fff")
       }
   });
 
-  $(".countryList li").each(function(){
-      if ($(this).text() == clickedCountry) {
+  $(".bodypartList li").each(function(){
+      if ($(this).text() == clickedBodyPart) {
         $(this).css("color", "#eeff5d")
       } else {
         $(this).css("color", "#fff")
       }
   });
 
-  /*--------------- for camera rotation when country is clicked ------------------*/
-  var targetPosition = xyz_from_lat_lng(countryObject.lat, countryObject.lng, 200);
+  /*--------------- for camera rotation when bodypart is clicked ------------------*/
+  var targetPosition = xyz_from_lat_lng(bodypartObject.posX, bodypartObject.posY, 200);
   // +20 so the point is not at the center, otherwise the curve will look flat
   targetPosition.z += 20;
 
@@ -718,17 +722,17 @@ stopAutoRotation = function(){
 /*------- for responsiveness ----------*/
 window.onresize = function() {
 	checkScreenSize();
-	checkCountryList();
+	checkBodyPartList();
 };
 
 
 
-//determines size of the CountryList. Used for responsiveness
-var checkCountryList = () => {
-if ($(".countryContainer").height() > 0) {
+//determines size of the BodyPartList. Used for responsiveness
+var checkBodyPartList = () => {
+if ($(".bodypartContainer").height() > 0) {
   var height = (window.innerHeight - 315);
   height = (height > 2500) ? 2500 : (height < 10) ? 10 : height
-      $(".countryContainer").css('height', height+'px');
+      $(".bodypartContainer").css('height', height+'px');
     }
 }
 
@@ -768,86 +772,6 @@ mySidenav.addEventListener("resize", function() {
 	console.log("col7 resize");
 	checkScreenSize();
 });
-
-
-
-/*------------- for nav bar definitions -----------------*/
-// for opening and closing of the navbar
-var open = false;
-var closeContainer = document.querySelector("#closeContainer");
-
-navbarButton.addEventListener("click", () => {
-
-	if (open) {
-
-	  mySidenav.classList.remove('show');
-
-	  contentWrapper.style.marginLeft = "0";
-	  // navbarButton.style.display = "block";
-	  navbarButton.classList.remove('open');
-	  closeContainer.classList.remove('show');
-
-
-	  open = false;
-	} else {
-
-	  mySidenav.classList.add('show');
-	  contentWrapper.style.marginLeft = "250px";
-	  navbarButton.classList.add('open');
-	  closeContainer.classList.add('show');
-	  open = true;
-	}
-
-});
-
-
-
-var input = document.getElementById('myInput');
-
-function searchBar() {
-
-	// Declare variables
-	var filter, ul, li, a, i;
-	filter = input.value.toUpperCase();
-	ul = document.getElementsByClassName("countryList")[0];
-	li = ul.getElementsByTagName('li');
-
-	// Loop through all list items, and hide those who don't match the search query
-	for (i = 0; i < li.length; i++) {
-	    // a = li[i].getElementsByTagName("a")[0];
-	    if (li[i].innerHTML.toUpperCase().indexOf(filter) > -1) {
-	        li[i].style.display = "";
-	    } else {
-	        li[i].style.display = "none";
-	    }
-	}
-}
-
-var searchicon = document.querySelector("#searchicon");
-var clearicon = document.querySelector("#clearicon");
-
-
-clearicon.addEventListener("click", function(){
-	input.value = "";
-	searchBar();
-	searchicon.style.display = "block";
-	clearicon.style.display = "none";
-});
-
-input.addEventListener("keyup", function() {
-
-if (input.value.length > 0) {
-	 searchicon.style.display = "none";
-	 clearicon.style.display = "block";
-	} else {
-	 searchicon.style.display = "block";
-	 clearicon.style.display = "none";
-	}
-});
-
-
-/*-------------- end of nav bar -----------*/
-
 
 /* INITIALISATION */
 if (!window.WebGLRenderingContext) {

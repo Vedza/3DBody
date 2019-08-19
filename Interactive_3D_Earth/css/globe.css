@@ -52,18 +52,18 @@
 
 .js-list li:hover {
 	background: #d5cccc !important;
-	cursor: pointer;
+	/*cursor: pointer;*/
 }
 
 .globe .globe-list > li {
 	opacity: 1;
 
 	position: absolute;
-	margin-left: -49px;
+	margin-left: -25px;
 	margin-top: -9px;
 	width: 14px;
 	height: 14px;
-	list-style-image: url('../img/dots.png');
+	/*list-style-image: url('../img/dots.png');*/
 
 	z-index: 51;
 }
@@ -79,12 +79,13 @@
 	z-index: 52;
 }
 
-	/*country text*/
+	/*bodypart text*/
 .globe .globe-list .text {
 	position: absolute;
 	opacity: 1;
-	right: -37px;
+	right: -30px;
 	top: 50%;
+
 	display: block;
 	font-size: 13px;
 	line-height: 9px;

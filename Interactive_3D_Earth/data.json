@@ -1,27 +1,36 @@
 [
   {
     "name": "Menton",
-    "lat": "50",
-    "lng": "10.039416"
+    "posX": "0",
+    "posY": "130",
+    "posZ": "35"
+
   },
   {
     "name": "Adipomastie",
-    "lat": "53.9333",
-    "lng": "5.5765"
+    "posX": "-20",
+    "posY": "70",
+    "posZ": "30"
+
   },
   {
     "name": "Ventre",
-    "lat": "-55.2744",
-    "lng": "10.7751"
+    "posX": "0",
+    "posY": "0",
+    "posZ": "30"
   },
   {
     "name": "Cuisses",
-    "lat": "47.51623",
-    "lng": "4.5501"
+    "posX": "-25",
+    "posY": "-80",
+    "posZ": "20"
+
   },
   {
     "name": "Genoux",
-    "lat": "47.51623",
-    "lng": "4.5501"
+    "posX": "30",
+    "posY": "-150",
+    "posZ": "10"
+
   }
 ]

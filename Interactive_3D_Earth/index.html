@@ -17,11 +17,11 @@
 
     <!-- import json data  -->
     <script type="text/javascript">
-      var allCompanies = null;
+      var allBodyPart = null;
       $.ajaxSettings.async = false;
       $.getJSON("data.json", function(json) {
-        allCompanies = json;
-        console.log(allCompanies.length);
+        allBodyPart = json;
+        console.log(allBodyPart.length);
       });
     </script>
 
@@ -46,8 +46,8 @@
         <img id="searchicon" src="img/searchicon.png" alt="searchicon" height="20" width="20">
         <img id="clearicon" src="img/error.png" alt="searchicon" height="24" width="24">
       </div>
-      <div class="countryContainer">
-        <ul class="countryList lead"></ul>
+      <div class="bodypartContainer">
+        <ul class="bodypartList lead"></ul>
       </div>
       <div id="devider"></div>
       <div id="functions">
@@ -72,7 +72,7 @@
             <div class="d-lg-block" id="logoContainer">
             </div>
             <div id="contentContainer">
-              <h1 id="countryName"></h1>
+              <h1 id="bodypartName"></h1>
               <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 720 58.2" style="margin-top: -11px;" xml:space="preserve">
                 <style type="text/css">
                   .st0{fill:none;stroke:#FFFFFF;}

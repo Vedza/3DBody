@@ -184,13 +184,13 @@ button:focus {
 }
 /*------------------------*/
 
-/*-----country list-----*/
-.countryContainer{
+/*-----bodypart list-----*/
+.bodypartContainer{
   margin-top: 10px;
   height: 72%;
 }
 
-.countryList {
+.bodypartList {
   color: white;
     list-style-type: none;
     font-size: 1.3rem;
@@ -202,16 +202,16 @@ button:focus {
     padding: 0;
 }
 
-.countryList::-webkit-scrollbar {
+.bodypartList::-webkit-scrollbar {
     display: none;
 }
 
-.countryList li {
+.bodypartList li {
   border-bottom: 1px solid #ffffff36;
   padding-bottom: 5px;
 }
 
-.countryList li:hover{
+.bodypartList li:hover{
   cursor: pointer;
   color: #948888 !important;
 }
@@ -283,7 +283,7 @@ button:focus {
 
 /*remove sidenav elements when window is very small*/
 @media screen and (max-height: 280px) {
-    .countryContainer {display: none;}
+    .bodypartContainer {display: none;}
     #searchContainer {display: none;}
     #devider {margin: 70px auto 0px;}
 }
