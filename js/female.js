@@ -290,6 +290,7 @@ function addBodyF() {
         }
     );
 
+
     // add clouds to the Earth
     var clouds = new THREE.TextureLoader().load('img/clouds.png');
     cloudMesh = new THREE.Mesh(new THREE.SphereGeometry(radius + 1.5, segments, rings), new THREE.MeshPhongMaterial({

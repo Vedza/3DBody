@@ -163,19 +163,16 @@
 }
 
 /*bodypart text*/
-.body2 .body-list2 .text2 {
+.body2 .body-list2 .text {
     position: absolute;
     opacity: 1;
     right: -30px;
     top: 50%;
 
     display: block;
-    font-size: 13px;
+    font-size: 10px;
     line-height: 9px;
-    font-weight: 600;
     text-align: right;
-    text-shadow: -1px -1px 0 #000000, 1px -1px 0 #000000, -1px 1px 0 #000000, 1px 1px 0 #000000;
-    color: #3ab9ff;
     white-space: nowrap;
     transform: translateY(-50%);
     width: auto;

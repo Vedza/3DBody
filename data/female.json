@@ -1,32 +1,32 @@
 [
   {
-    "name": "aaaaaaaaaaaaa",
-    "posX": "0",
-    "posY": "130",
-    "posZ": "30"
+    "name": "Bras",
+    "posX": "45",
+    "posY": "40",
+    "posZ": "5"
   },
   {
-    "name": "bbbbbbbbbb",
-    "posX": "-20",
-    "posY": "70",
-    "posZ": "25"
-  },
-  {
-    "name": "ccccccccc",
-    "posX": "0",
-    "posY": "0",
-    "posZ": "25"
-  },
-  {
-    "name": "ddddddddddddddddd",
-    "posX": "-25",
-    "posY": "-80",
-    "posZ": "15"
-  },
-  {
-    "name": "eeeeeeeeee",
-    "posX": "40",
-    "posY": "-150",
+    "name": "Pli du soutien-gorge",
+    "posX": "-30",
+    "posY": "50",
     "posZ": "0"
+  },
+  {
+    "name": "Poignées d'amour",
+    "posX": "30",
+    "posY": "-10",
+    "posZ": "10"
+  },
+  {
+    "name": "Culottes de cheval",
+    "posX": "-20",
+    "posY": "-65",
+    "posZ": "-15"
+  },
+  {
+    "name": "Mollets",
+    "posX": "30",
+    "posY": "-160",
+    "posZ": "-25"
   }
 ]

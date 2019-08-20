@@ -6,4 +6,4 @@
 * Body rotating to make points clicked always facing the user
 
 ## Screenshot:
-![alt text](http://i64.tinypic.com/6p3mo2.png)
+![alt text]()
