@@ -3,12 +3,12 @@
     "name": "Bras",
     "posX": "45",
     "posY": "40",
-    "posZ": "5"
+    "posZ": "0"
   },
   {
     "name": "Pli du soutien-gorge",
-    "posX": "-30",
-    "posY": "50",
+    "posX": "-25",
+    "posY": "35",
     "posZ": "0"
   },
   {
