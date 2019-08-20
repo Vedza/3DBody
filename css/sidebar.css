@@ -69,6 +69,11 @@ h2 {
   position: relative;
 }
 
+.container-fluid2{
+  min-height: 100%;
+  position: relative;
+}
+
 #bodypartName{
   font-size: 62px;
   margin-bottom: -25px;

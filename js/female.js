@@ -14,9 +14,7 @@ var canvas, scene, renderer, data;
 var container2 = document.getElementsByClassName('js-body2')[0];
 
 //Elements for shifting navbar
-var mySidenav = document.querySelector("#mySidenav");
-var contentWrapper = document.querySelector("#contentWrapper");
-var navbarButton = document.querySelector("#closeButton");
+var contentWrapper = document.querySelector("#contentWrapper2");
 var bodypartListF = document.querySelector(".bodypartList");
 
 
@@ -68,9 +66,6 @@ var animations = {
 // Boolean to enable or disable rendering when window is in or out of focus
 var isHidden = false;
 
-// drawCount sets the range of curve for animation
-var drawCount = 0;
-
 // define a global variable for Pi
 var PI180 = Math.PI / 180.0;
 
@@ -116,7 +111,7 @@ function setupSceneF() {
 
     //add directional light
     camera.light = new THREE.DirectionalLight(0xffffff, 1);
-    camera.light.position.set(1, 1, 1);
+    camera.light.position.set(1, 1000, 1);
     camera.light.castShadow = true;           // default false
     scene.add(camera.light);
 
@@ -131,7 +126,8 @@ function setupSceneF() {
 
     // Add the main group to the scene
     scene.add(groups.main);
-
+    document.addEventListener('mouseover', onDocumentMouseOver, false);
+    document.addEventListener('mouseout', onDocumentMouseOut, false);
     // Render camera and add orbital controls
     addCameraF();
     addControlsF();
@@ -141,7 +137,7 @@ function setupSceneF() {
 
     //	if (Object.keys(data.bodyparts).length > 0) {
     //addLines();
-    createListElements();
+    createListElementsF();
 
     // Start the requestAnimationFrame loop
 
@@ -149,7 +145,7 @@ function setupSceneF() {
 
     animate();
     checkScreenSize();
-    checkBodyPartList();
+    checkBodyPartListF();
 
 
 }
@@ -174,7 +170,7 @@ function addControlsF() {
     camera.controls.minDistance = 500;
     camera.controls.maxDistance = 5000;
     camera.controls.autoRotate = true; //this is what allows rotation around the body without DOM element positiong being lost
-    camera.controls.autoRotateSpeed = 1.25;
+    camera.controls.autoRotateSpeed = 0.75;
     camera.controls.minPolarAngle = Math.PI / 2.5;
     camera.controls.maxPolarAngle = Math.PI / 2.5;
 }
@@ -198,6 +194,7 @@ if ('hidden' in document) {
     window.onpageshow = window.onpagehide = window.onfocus = window.onblur = onFocusChange;
 }
 
+
 function onFocusChange(event) {
     var visible = 'visible';
     var hidden = 'hidden';
@@ -217,6 +214,13 @@ function onFocusChange(event) {
     }
 }
 
+function onDocumentMouseOver(event) {
+    camera.controls.autoRotate = false;
+}
+
+function onDocumentMouseOut(event) {
+    camera.controls.autoRotate = true;
+}
 
 function animate() {
     camera.light.position.copy(camera.object.getWorldPosition());
@@ -263,6 +267,8 @@ function addBodyF() {
     var loader = new THREE.TextureLoader();
     var loader = new THREE.GLTFLoader();
 
+    var mymaterial = new THREE.MeshLambertMaterial( { ambient: 0x555555, color: 0x555555, specular: 0xffffff, shininess: 50, shading: THREE.SmoothShading } );
+
 // Load a glTF resource
     loader.load(
         // resource URL
@@ -271,6 +277,12 @@ function addBodyF() {
         function (gltf) {
             gltf.scene.scale.set(50, 50, 50);
             body.add(gltf.scene);
+            gltf.scene.traverse((o) => {
+                if (o.isMesh) {
+                    o.material = mymaterial;
+                    o.material.emissive = new THREE.Color( 0x444444 );
+                }
+            });
             gltf.animations; // Array<THREE.AnimationClip>
             gltf.scene; // THREE.Scene
             gltf.scenes; // Array<THREE.Scene>
@@ -333,7 +345,7 @@ function addBodyDots() {
     texture.needsUpdate = true;
     var material = new THREE.PointsMaterial({
         map: texture,
-        size: props.bodyRadius / 40
+        size: props.bodyRadius / 100
     });
 
     var addDot = function (targetX, targetY, targetZ) {
@@ -391,139 +403,10 @@ function checkPinVisibility() {
     }
 }
 
-
-/* bodypart LINES AND DOTS */
-
-// this functions does not draw the curve, but sets the curve properties namely the points which will be drawn
-// animation will be done by updateCurve
-function animatedCurve(e, i) {
-    //no bodypart selected clear all previous entries
-    if (e === null) {
-        groups.lines.children = [];
-        return;
-    }
-
-    // Create the geometry
-    var geometry = new THREE.BufferGeometry();
-    // aBodyPart represent the bodypart that the line is going to start from
-    var aBodyPart = allBodyPart2[i];
-    // line mesh represeting aBodyPart
-    var curveObject = null;
-
-    var group = new THREE.Group();
-    var pointsPosition = [];
-    var spline_control_points = 8;
-    // this determines the height of the curves which will be drawn
-    var max_height = 0.3 * 50 + 0.05;  // change 0.3 to adjust height of the curve
-    // add controls points so the curve looks smooth
-    for (var i = 0; i < spline_control_points + 1; i++) {
-        var arc_angle = i * 180.0 / spline_control_points;
-        var arc_radius = props.bodyRadius + Math.sin(arc_angle * PI180) * max_height;
-        //var latlng = lat_lng_inter_point(e.posX, e.posY, aBodyPart.posX, aBodyPart.posY, i / spline_control_points);
-        //var pos = xyz_from_lat_lng(latlng.posX, latlng.posY, arc_radius);
-        pointsPosition.push(new THREE.Vector3(aBodyPart.posX, aBodyPart.posY, 0));
-    }
-
-    // Get verticies from curve
-    // 200 indicates that the curve will be repeatedly drawn 200 times; animation works in the way that each time more points are drawn
-    geometry.vertices = curve.getPoints(200);
-
-    const points = new Float32Array(600);
-    // add points to the geometry's position
-    geometry.addAttribute('position', new THREE.BufferAttribute(points, 3));
-    for (let k = 0, j = 0; k < geometry.vertices.length; k++) {
-        var vertex = geometry.vertices[k];
-        points[j++] = vertex.x;
-        points[j++] = vertex.y;
-        points[j++] = vertex.z;
-    }
-    // set draw range (0, 2) means that initial drawing of the curve is up to 2 points only. Rest points will be drawn in updateCurve
-    geometry.setDrawRange(0, 2);
-
-    // Create the mesh line material using the plugin
-    var material = new THREE.LineBasicMaterial({
-        color: props.colours.lines,
-        opacity: props.alphas.lines,
-        linewidth: 2,
-    });
-
-    // Create the final object to add to the scene
-    curveObject = new THREE.Line(geometry, material);
-
-    curveObject._path = geometry.vertices;
-
-    groups.lines.add(curveObject);
-}
-
-// animate the curve drawing whose properties set by animatedCurve
-function updateCurve() {
-    // turn off event listener so users can't click during animation
-    $(".body-list2").off("click");
-    $(".bodypartListF").off("click");
-    // determine the speed of the animation
-    drawCount += 2;
-    // animate every curve by changing drawCount
-    for (var i = 0; i < groups.lines.children.length; i++) {
-        groups.lines.children[i].geometry.setDrawRange(0, drawCount);
-    }
-    if (drawCount <= 200) { //draw until 200 points
-        requestAnimationFrame(updateCurve);
-    } else {
-        // set drawCount to 0 in order for the animation in the next click
-        drawCount = 0;
-        // put event listener back after animation so users can click them again
-        $(".body-list2").on("click", clickFn);
-        $(".bodypartListF").on("click", clickFn);
-        $([$(".body-canvas2"), $(".body-list2"), $(".bodypartListF")]).each(function () {
-            $(this).on('click', stopAutoRotation);
-        });
-        return;
-    }
-}
-
-
-/* COORDINATE CALCULATIONS */
-
-// Returns an object of 3D spherical coordinates based on the the latitude and longitude
-function xyz_from_lat_lng(posX, posY, radius) {
-    var phi = (90 - posX) * PI180;
-    var theta = (360 - posY) * PI180;
-
-    return {
-        x: radius * Math.sin(phi) / 3 * Math.cos(theta),
-        y: radius * Math.cos(phi) / 3,
-        z: radius * Math.sin(phi) * Math.sin(theta)
-    };
-}
-
-// linear interpolation for catmull curve
-function lat_lng_inter_point(lat1, lng1, lat2, lng2, offset) {
-
-    lat1 = lat1 * PI180;
-    lng1 = lng1 * PI180;
-    lat2 = lat2 * PI180;
-    lng2 = lng2 * PI180;
-
-    var d = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin((lat1 - lat2) / 2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin((lng1 - lng2) / 2), 2)));
-    var A = Math.sin((1 - offset) * d) / Math.sin(d);
-    var B = Math.sin(offset * d) / Math.sin(d);
-    var x = A * Math.cos(lat1) * Math.cos(lng1) + B * Math.cos(lat2) * Math.cos(lng2);
-    var y = A * Math.cos(lat1) * Math.sin(lng1) + B * Math.cos(lat2) * Math.sin(lng2);
-    var z = A * Math.sin(lat1) + B * Math.sin(lat2);
-    var posX = Math.atan2(z, Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2))) * 180 / Math.PI;
-    var posY = Math.atan2(y, x) * 180 / Math.PI;
-
-    return {
-        posX: posX,
-        posY: posY
-    }
-}
-
-
 /* ELEMENTS */
 var list;
 
-function createListElements() {
+function createListElementsF() {
     list = document.getElementsByClassName('js-list2')[0];
     var pushObject = function (coordinates, target) {
         // Create the element
@@ -573,8 +456,21 @@ function positionElements() { // place the label
     }
 }
 
+function getProjectedPosition(width, height, position) {
+    /*
+        Using the coordinates of a bodypart in the 3D space, this function will
+        return the 2D coordinates using the camera projection method.
+    */
+    position = position.clone();
+    var projected = position.project(camera.object);
+    return {
+        x: (projected.x * width) + width,
+        y: -(projected.y * height) + height
+    };
+}
+
+
 /* INTRO ANIMATIONS */
-// Easing reference: https://gist.github.com/gre/1650294
 var easeInOutCubic = function (t) {
     return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
 };
@@ -608,149 +504,32 @@ function introAnimate() {
     }
 }
 
-// Returns an object of 2D coordinates for projected 3D position
-function getProjectedPosition(width, height, position) {
-    /*
-        Using the coordinates of a bodypart in the 3D space, this function will
-        return the 2D coordinates using the camera projection method.
-    */
-    position = position.clone();
-    var projected = position.project(camera.object);
-    return {
-        x: (projected.x * width) + width,
-        y: -(projected.y * height) + height
-    };
-}
-
-/* -------------------- for click manipulation ---------------------------*/
-
-var clickFn = function (e) {
-
-    var brandLogo = document.getElementById('logoContainer');
-    var content = document.getElementById('contentContainer');
-
-    // find the object which is being clicked
-    var bodypartObject;
-    var clickedBodyPart;
-    for (var i = 0; i < allBodyPart2.length; i++) {
-        clickedBodyPart = e.target.innerText;
-        if (clickedBodyPart == allBodyPart2[i].name) {
-            bodypartObject = allBodyPart2[i];
-        }
-    }
-
-    //clear all curves which have been drawn
-    groups.lines.children = [];
-
-    //update line mesh
-    if (e.target.innerText == "Ontario") {
-        for (var i = 0; i < allBodyPart2.length; i++) {
-            animatedCurve(bodypartObject, i);
-        }
-    } else {
-        animatedCurve(bodypartObject, 0);
-    }
-    // animate line drawing
-    //TODO: maybe put it back
-    // updateCurve();
-
-
-    //update color of the dots being clicked
-    $(".body-list2 li").each(function () {
-        if ($(this).attr('class') == clickedBodyPart) {
-            $(this).css("background-color", "#eeff5d")
-        } else {
-            $(this).css("background-color", "#fff")
-        }
-    });
-
-    $(".bodypartListF li").each(function () {
-        if ($(this).text() == clickedBodyPart) {
-            $(this).css("color", "#eeff5d")
-        } else {
-            $(this).css("color", "#fff")
-        }
-    });
-
-    /*--------------- for camera rotation when bodypart is clicked ------------------*/
-    var targetPosition = xyz_from_lat_lng(bodypartObject.posX, bodypartObject.posY, 200);
-    // +20 so the point is not at the center, otherwise the curve will look flat
-    targetPosition.z += 20;
-
-    // get the current camera position
-    const {x, y, z} = camera.object.position
-    const start = new THREE.Vector3(x, y, z)
-
-    // move camera to the target
-    const point = targetPosition
-    const camDistance = camera.object.position.length()
-    camera.object.position
-        .copy(point)
-        .normalize()
-        .multiplyScalar(camDistance)
-
-    // save the camera position
-    const {x: a, y: b, z: c} = camera.object.position
-
-    // invert back to original position
-    camera.object.position
-        .copy(start)
-        .normalize()
-        .multiplyScalar(camDistance)
-    // animate from start to end
-    TweenMax.to(camera.object.position, 1, {
-        x: a, y: b, z: c, onUpdate: () => {
-            camera.controls.update()
-        }
-    })
-
-    /*-------------------- camera end -----------------------------*/
-
-
-}
-
-
-/*---------------------- stop auto rotation ---------------------*/
-
-var timeoutFn;
-stopAutoRotation = function () {
-    camera.controls.autoRotate = false;
-    // reset setTimeout when clicked within 30 seconds
-    if (timeoutFn != undefined) {
-        clearTimeout(timeoutFn);
-    }
-    timeoutFn = setTimeout(function () {
-        camera.controls.autoRotate = true; //this is what allows rotation around the body without DOM element positiong being lost
-    }, 30000)
-}
-
 /*------- for responsiveness ----------*/
 window.onresize = function () {
     checkScreenSize();
-    checkBodyPartList();
+    checkBodyPartListF();
 };
 
 
 //determines size of the BodyPartList. Used for responsiveness
-var checkBodyPartList = () => {
-    if ($(".bodypartContainer").height() > 0) {
+var checkBodyPartListF = () => {
+    if ($(".bodypartContainer2").height() > 0) {
         var height = (window.innerHeight - 315);
         height = (height > 2500) ? 2500 : (height < 10) ? 10 : height
-        $(".bodypartContainer").css('height', height + 'px');
+        $(".bodypartContainer2").css('height', height + 'px');
     }
 }
 
-var col5 = document.querySelector(".col-xl-5");
+var col5 = document.querySelector(".col-xl-6");
 var col7 = document.querySelector(".col-xl-7");
 var checkScreenSize = () => {
     var topGlow = document.getElementById('top-glow2');
-    var bodyContainer = document.getElementsByClassName('js-body2')[0];
+    var bodyContainer2 = document.getElementsByClassName('js-body2')[0];
     var currentWidth = $("#bodyContainer2").width();
     var currentHeight = $("#bodyContainer2").height();
 
     var width = window.innerWidth;
 
-    // width <= 1199 ? col5.parentNode.insertBefore(col7, col5) : col7.parentNode.insertBefore(col5, col7);
     if (width <= 1199) {
         col5.parentNode.insertBefore(col7, col5);
         container2.width = currentWidth;
@@ -772,10 +551,6 @@ var checkScreenSize = () => {
 
 }
 
-mySidenav.addEventListener("resize", function () {
-    console.log("col7 resize");
-    checkScreenSize();
-});
 
 /* INITIALISATION */
 if (!window.WebGLRenderingContext) {

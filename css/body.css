@@ -19,6 +19,8 @@
     z-index: 9999;
 }
 
+
+
 /*------------------------*/
 
 /*---body container and list---*/
@@ -96,12 +98,6 @@
     height: 16px;
     padding: 2px;
 }
-
-/*------------------------*/
-
-
-/*------------------------*/
-
 /*---body container and list---*/
 .js-body2 {
     position: relative;
@@ -184,7 +180,6 @@
     .body {
         display: none;
     }
-
     .body2 {
         display: none;
     }

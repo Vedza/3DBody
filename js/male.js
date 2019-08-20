@@ -8,10 +8,12 @@ $(window).on("load", function () {
 });
 
 // declare variables for rendering
-var canvas, scene, renderer, data;
+var canvas, scene, renderer, data, stats, controls;
 
 // Cache DOM selectors
 var container = document.getElementsByClassName('js-body')[0];
+var projector, mouse = {x: 0, y: 0}, INTERSECTED;
+var vector = new THREE.Vector3(mouse.x, mouse.y, 1);
 
 //Elements for shifting navbar
 var mySidenav = document.querySelector("#mySidenav");
@@ -89,10 +91,7 @@ function setupScene() {
         canvas: canvas,
         antialias: true,
         alpha: true,
-        shadowMapEnabled: true
     });
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
 
     renderer.setSize(canvas.clientWidth, canvas.clientHeight);
     renderer.setPixelRatio(1);
@@ -118,13 +117,8 @@ function setupScene() {
     //add directional light
     camera.light = new THREE.DirectionalLight(0xffffff, 1);
     camera.light.position.set(1, 1, 1);
-    camera.light.castShadow = true;            // default false
     scene.add(camera.light);
 
-    camera.light.shadow.mapSize.width = 512;  // default
-    camera.light.shadow.mapSize.height = 512; // default
-    camera.light.shadow.camera.near = 0.5;       // default
-    camera.light.shadow.camera.far = 500      // default
 
     // gui.add(camera.light.position, 'y', 0, 20);
     // gui.add(camera.light.position, 'x', 0, 20);
@@ -132,7 +126,8 @@ function setupScene() {
 
     // Add the main group to the scene
     scene.add(groups.main);
-
+    document.addEventListener('mouseover', onDocumentMouseOver, false);
+    document.addEventListener('mouseout', onDocumentMouseOut, false);
     // Render camera and add orbital controls
     addCamera();
     addControls();
@@ -218,7 +213,13 @@ function onFocusChange(event) {
     }
 }
 
+function onDocumentMouseOver(event) {
+    camera.controls.autoRotate = false;
+}
 
+function onDocumentMouseOut(event) {
+    camera.controls.autoRotate = true;
+}
 function animate() {
     camera.light.position.copy(camera.object.getWorldPosition());
     if (isHidden === false) {
@@ -263,6 +264,7 @@ function addBody() {
     var body = new THREE.Group();
     var loader = new THREE.TextureLoader();
     var loader = new THREE.GLTFLoader();
+    var mymaterial = new THREE.MeshLambertMaterial( { ambient: 0x555555, color: 0x555555, specular: 0xffffff, shininess: 50, shading: THREE.SmoothShading } );
 
 // Load a glTF resource
     loader.load(
@@ -272,6 +274,12 @@ function addBody() {
         function (gltf) {
             gltf.scene.scale.set(50, 50, 50);
             body.add(gltf.scene);
+            gltf.scene.traverse((o) => {
+                if (o.isMesh) {
+                    o.material = mymaterial;
+                    o.material.emissive = new THREE.Color( 0x444444 );
+                }
+            });
             gltf.animations; // Array<THREE.AnimationClip>
             gltf.scene; // THREE.Scene
             gltf.scenes; // Array<THREE.Scene>
@@ -302,8 +310,7 @@ function addBody() {
 
     groups.body = new THREE.Group();
     groups.body.name = 'Body';
-    groups.body.castShadow = true; //default is false
-    groups.body.receiveShadow = false; //default
+
     groups.body.add(body);
     groups.main.add(groups.body);
     addBodyDots();
@@ -333,7 +340,7 @@ function addBodyDots() {
     texture.needsUpdate = true;
     var material = new THREE.PointsMaterial({
         map: texture,
-        size: props.bodyRadius / 40
+        size: props.bodyRadius / 100
     });
 
     var addDot = function (targetX, targetY, targetZ) {
@@ -396,64 +403,6 @@ function checkPinVisibility() {
 
 // this functions does not draw the curve, but sets the curve properties namely the points which will be drawn
 // animation will be done by updateCurve
-function animatedCurve(e, i) {
-    //no bodypart selected clear all previous entries
-    if (e === null) {
-        groups.lines.children = [];
-        return;
-    }
-
-    // Create the geometry
-    var geometry = new THREE.BufferGeometry();
-    // aBodyPart represent the bodypart that the line is going to start from
-    var aBodyPart = allBodyPart[i];
-    // line mesh represeting aBodyPart
-    var curveObject = null;
-
-    var group = new THREE.Group();
-    var pointsPosition = [];
-    var spline_control_points = 8;
-    // this determines the height of the curves which will be drawn
-    var max_height = 0.3 * 50 + 0.05;  // change 0.3 to adjust height of the curve
-    // add controls points so the curve looks smooth
-    for (var i = 0; i < spline_control_points + 1; i++) {
-        var arc_angle = i * 180.0 / spline_control_points;
-        var arc_radius = props.bodyRadius + Math.sin(arc_angle * PI180) * max_height;
-        //var latlng = lat_lng_inter_point(e.posX, e.posY, aBodyPart.posX, aBodyPart.posY, i / spline_control_points);
-        //var pos = xyz_from_lat_lng(latlng.posX, latlng.posY, arc_radius);
-        pointsPosition.push(new THREE.Vector3(aBodyPart.posX, aBodyPart.posY, 0));
-    }
-
-    // Get verticies from curve
-    // 200 indicates that the curve will be repeatedly drawn 200 times; animation works in the way that each time more points are drawn
-    geometry.vertices = curve.getPoints(200);
-
-    const points = new Float32Array(600);
-    // add points to the geometry's position
-    geometry.addAttribute('position', new THREE.BufferAttribute(points, 3));
-    for (let k = 0, j = 0; k < geometry.vertices.length; k++) {
-        var vertex = geometry.vertices[k];
-        points[j++] = vertex.x;
-        points[j++] = vertex.y;
-        points[j++] = vertex.z;
-    }
-    // set draw range (0, 2) means that initial drawing of the curve is up to 2 points only. Rest points will be drawn in updateCurve
-    geometry.setDrawRange(0, 2);
-
-    // Create the mesh line material using the plugin
-    var material = new THREE.LineBasicMaterial({
-        color: props.colours.lines,
-        opacity: props.alphas.lines,
-        linewidth: 2,
-    });
-
-    // Create the final object to add to the scene
-    curveObject = new THREE.Line(geometry, material);
-
-    curveObject._path = geometry.vertices;
-
-    groups.lines.add(curveObject);
-}
 
 // animate the curve drawing whose properties set by animatedCurve
 function updateCurve() {
@@ -622,93 +571,6 @@ function getProjectedPosition(width, height, position) {
     };
 }
 
-/* -------------------- for click manipulation ---------------------------*/
-
-var clickFn = function (e) {
-
-    var brandLogo = document.getElementById('logoContainer');
-    var content = document.getElementById('contentContainer');
-
-    // find the object which is being clicked
-    var bodypartObject;
-    var clickedBodyPart;
-    for (var i = 0; i < allBodyPart.length; i++) {
-        clickedBodyPart = e.target.innerText;
-        if (clickedBodyPart == allBodyPart[i].name) {
-            bodypartObject = allBodyPart[i];
-        }
-    }
-
-    //clear all curves which have been drawn
-    groups.lines.children = [];
-
-    //update line mesh
-    if (e.target.innerText == "Ontario") {
-        for (var i = 0; i < allBodyPart.length; i++) {
-            animatedCurve(bodypartObject, i);
-        }
-    } else {
-        animatedCurve(bodypartObject, 0);
-    }
-    // animate line drawing
-    //TODO: maybe put it back
-    // updateCurve();
-
-
-    //update color of the dots being clicked
-    $(".body-list li").each(function () {
-        if ($(this).attr('class') == clickedBodyPart) {
-            $(this).css("background-color", "#eeff5d")
-        } else {
-            $(this).css("background-color", "#fff")
-        }
-    });
-
-    $(".bodypartList li").each(function () {
-        if ($(this).text() == clickedBodyPart) {
-            $(this).css("color", "#eeff5d")
-        } else {
-            $(this).css("color", "#fff")
-        }
-    });
-
-    /*--------------- for camera rotation when bodypart is clicked ------------------*/
-    var targetPosition = xyz_from_lat_lng(bodypartObject.posX, bodypartObject.posY, 200);
-    // +20 so the point is not at the center, otherwise the curve will look flat
-    targetPosition.z += 20;
-
-    // get the current camera position
-    const {x, y, z} = camera.object.position
-    const start = new THREE.Vector3(x, y, z)
-
-    // move camera to the target
-    const point = targetPosition
-    const camDistance = camera.object.position.length()
-    camera.object.position
-        .copy(point)
-        .normalize()
-        .multiplyScalar(camDistance)
-
-    // save the camera position
-    const {x: a, y: b, z: c} = camera.object.position
-
-    // invert back to original position
-    camera.object.position
-        .copy(start)
-        .normalize()
-        .multiplyScalar(camDistance)
-    // animate from start to end
-    TweenMax.to(camera.object.position, 1, {
-        x: a, y: b, z: c, onUpdate: () => {
-            camera.controls.update()
-        }
-    })
-
-    /*-------------------- camera end -----------------------------*/
-
-
-}
-
 
 /*---------------------- stop auto rotation ---------------------*/
 
@@ -740,8 +602,8 @@ var checkBodyPartList = () => {
     }
 }
 
-var col5 = document.querySelector(".col-xl-5");
-var col7 = document.querySelector(".col-xl-7");
+var col5 = document.querySelector(".col-xl-1");
+var col7 = document.querySelector(".col-xl-3");
 var checkScreenSize = () => {
     var topGlow = document.getElementById('top-glow');
     var bodyContainer = document.getElementsByClassName('js-body')[0];
