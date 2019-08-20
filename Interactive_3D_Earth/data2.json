@@ -1,0 +1,32 @@
+[
+  {
+    "name": "aaaaaaaaaaaaa",
+    "posX": "0",
+    "posY": "130",
+    "posZ": "30"
+  },
+  {
+    "name": "bbbbbbbbbb",
+    "posX": "-20",
+    "posY": "70",
+    "posZ": "25"
+  },
+  {
+    "name": "ccccccccc",
+    "posX": "0",
+    "posY": "0",
+    "posZ": "25"
+  },
+  {
+    "name": "ddddddddddddddddd",
+    "posX": "-25",
+    "posY": "-80",
+    "posZ": "15"
+  },
+  {
+    "name": "eeeeeeeeee",
+    "posX": "40",
+    "posY": "-150",
+    "posZ": "0"
+  }
+]
