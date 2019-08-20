@@ -11,7 +11,7 @@ $(window).on("load", function () {
 var canvas, scene, renderer, data;
 
 // Cache DOM selectors
-var container2 = document.getElementsByClassName('js-globe2')[0];
+var container2 = document.getElementsByClassName('js-body2')[0];
 
 //Elements for shifting navbar
 var mySidenav = document.querySelector("#mySidenav");
@@ -27,24 +27,24 @@ var elements = {};
 // Three group objects
 var groups = {
     main: null, // A group containing everything
-    globe: null, // A group containing the globe sphere
-    globeDots: null, // A group containing the globe dots
+    body: null, // A group containing the body sphere
+    bodyDots: null, // A group containing the body dots
     lines: null, // A group containing the lines between each bodypart
 };
 
 // Map properties for creation and rendering
 var props = {
 
-    globeRadius: 200, // Radius of the globe (used for many calculations)
+    bodyRadius: 200, // Radius of the body (used for many calculations)
     colours: {
         // Cache the colours
-        globeDots: 'rgb(61, 137, 164)', // No need to use the Three constructor as this value is used for the HTML canvas drawing 'fillStyle' property
+        bodyDots: 'rgb(61, 137, 164)', // No need to use the Three constructor as this value is used for the HTML canvas drawing 'fillStyle' property
         lines: new THREE.Color('#eeff5d'),
         lineDots: new THREE.Color('#18FFFF')
     },
     alphas: {
         // Transparent values of materials
-        globe: 0.4,
+        body: 0.4,
         lines: 0.5
     }
 };
@@ -59,9 +59,9 @@ var camera = {
 var animations = {
     finishedIntro: false, // Boolean of when the intro animations have finished
     dots: {
-        current: 0, // Animation frames of the globe dots introduction animation
-        total: 170, // Total frames (duration) of the globe dots introduction animation,
-        points: [] // Array to clone the globe dots coordinates to
+        current: 0, // Animation frames of the body dots introduction animation
+        total: 170, // Total frames (duration) of the body dots introduction animation,
+        points: [] // Array to clone the body dots coordinates to
     },
 };
 
@@ -173,7 +173,7 @@ function addControlsF() {
     camera.controls.rotateSpeed = 0.25;
     camera.controls.minDistance = 500;
     camera.controls.maxDistance = 5000;
-    camera.controls.autoRotate = true; //this is what allows rotation around the globe without DOM element positiong being lost
+    camera.controls.autoRotate = true; //this is what allows rotation around the body without DOM element positiong being lost
     camera.controls.autoRotateSpeed = 1.25;
     camera.controls.minPolarAngle = Math.PI / 2.5;
     camera.controls.maxPolarAngle = Math.PI / 2.5;
@@ -234,7 +234,7 @@ function animate() {
     render();
 }
 
-/* GLOBE */
+/* body */
 function addBodyF() {
     var textureLoader = new THREE.TextureLoader();
     textureLoader.setCrossOrigin(true);
@@ -259,18 +259,18 @@ function addBodyF() {
     // Make texture
     var texture = new THREE.Texture(textureCanvas);
     texture.needsUpdate = true;
-    var globe = new THREE.Group();
+    var body = new THREE.Group();
     var loader = new THREE.TextureLoader();
     var loader = new THREE.GLTFLoader();
 
 // Load a glTF resource
     loader.load(
         // resource URL
-        'models/full.gltf2.glb',
+        'models/female.glb',
         // called when the resource is loaded
         function (gltf) {
             gltf.scene.scale.set(50, 50, 50);
-            globe.add(gltf.scene);
+            body.add(gltf.scene);
             gltf.animations; // Array<THREE.AnimationClip>
             gltf.scene; // THREE.Scene
             gltf.scenes; // Array<THREE.Scene>
@@ -297,14 +297,14 @@ function addBodyF() {
         transparent: true
     }));
 
-    globe.add(cloudMesh);
+    body.add(cloudMesh);
 
-    groups.globe = new THREE.Group();
-    groups.globe.name = 'Body';
-    groups.globe.castShadow = true; //default is false
-    groups.globe.receiveShadow = false; //default
-    groups.globe.add(globe);
-    groups.main.add(groups.globe);
+    groups.body = new THREE.Group();
+    groups.body.name = 'Body';
+    groups.body.castShadow = true; //default is false
+    groups.body.receiveShadow = false; //default
+    groups.body.add(body);
+    groups.main.add(groups.body);
     addBodyDots();
 }
 
@@ -324,7 +324,7 @@ function addBodyDots() {
     var canvasContext = textureCanvas.getContext('2d');
     canvasContext.beginPath();
     canvasContext.arc(halfSize, halfSize, halfSize, 0, 2 * Math.PI);
-    canvasContext.fillStyle = props.colours.globeDots;
+    canvasContext.fillStyle = props.colours.bodyDots;
     canvasContext.fill();
 
     // Make texture
@@ -332,7 +332,7 @@ function addBodyDots() {
     texture.needsUpdate = true;
     var material = new THREE.PointsMaterial({
         map: texture,
-        size: props.globeRadius / 40
+        size: props.bodyRadius / 40
     });
 
     var addDot = function (targetX, targetY, targetZ) {
@@ -355,36 +355,36 @@ function addBodyDots() {
     }
 
     // Add the points to the scene
-    groups.globeDots = new THREE.Points(geometry, material);
-    groups.globe.add(groups.globeDots);
+    groups.bodyDots = new THREE.Points(geometry, material);
+    groups.body.add(groups.bodyDots);
 
 }
 
 // use trigonometry to determine if points are closer than the front half of the earth.
 function checkPinVisibility() {
-    var earth = groups.globe.children[0].children[1];
+    var earth = groups.body.children[0].children[1];
     if (earth !== undefined) {
         var cameraToEarth = earth.position.clone().sub(camera.object.position);
         var L = cameraToEarth.length();
-        for (var i = 0; i < $(".globe-list2 li").length; i++) {
-            var cameraToPin = groups.globeDots.geometry.vertices[i].clone().sub(camera.object.position);
+        for (var i = 0; i < $(".body-list2 li").length; i++) {
+            var cameraToPin = groups.bodyDots.geometry.vertices[i].clone().sub(camera.object.position);
             var index = i + 1;
             if (cameraToPin.length() - 4 > L && index < 4 && index != 2) {
-                $(".globe-list2 li:nth-child(" + index + ")").css("display", "none");
+                $(".body-list2 li:nth-child(" + index + ")").css("display", "none");
             } else if (index < 4 && index != 2) {
-                $(".globe-list2 li:nth-child(" + index + ")").css("display", "");
+                $(".body-list2 li:nth-child(" + index + ")").css("display", "");
             } else if (cameraToPin.length() > L - 15 && index == 2) {
-                $(".globe-list2 li:nth-child(" + index + ")").css("display", "none");
+                $(".body-list2 li:nth-child(" + index + ")").css("display", "none");
             } else if (index == 2) {
-                $(".globe-list2 li:nth-child(" + index + ")").css("display", "");
+                $(".body-list2 li:nth-child(" + index + ")").css("display", "");
             } else if (cameraToPin.length() > L + 30 && index == 4) {
-                $(".globe-list2 li:nth-child(" + index + ")").css("display", "none");
+                $(".body-list2 li:nth-child(" + index + ")").css("display", "none");
             } else if (index == 4) {
-                $(".globe-list2 li:nth-child(" + index + ")").css("display", "");
+                $(".body-list2 li:nth-child(" + index + ")").css("display", "");
             } else if (cameraToPin.length() > L + 50 && index == 5) {
-                $(".globe-list2 li:nth-child(" + index + ")").css("display", "none");
+                $(".body-list2 li:nth-child(" + index + ")").css("display", "none");
             } else {
-                $(".globe-list2 li:nth-child(" + index + ")").css("display", "");
+                $(".body-list2 li:nth-child(" + index + ")").css("display", "");
             }
         }
     }
@@ -417,7 +417,7 @@ function animatedCurve(e, i) {
     // add controls points so the curve looks smooth
     for (var i = 0; i < spline_control_points + 1; i++) {
         var arc_angle = i * 180.0 / spline_control_points;
-        var arc_radius = props.globeRadius + Math.sin(arc_angle * PI180) * max_height;
+        var arc_radius = props.bodyRadius + Math.sin(arc_angle * PI180) * max_height;
         //var latlng = lat_lng_inter_point(e.posX, e.posY, aBodyPart.posX, aBodyPart.posY, i / spline_control_points);
         //var pos = xyz_from_lat_lng(latlng.posX, latlng.posY, arc_radius);
         pointsPosition.push(new THREE.Vector3(aBodyPart.posX, aBodyPart.posY, 0));
@@ -457,7 +457,7 @@ function animatedCurve(e, i) {
 // animate the curve drawing whose properties set by animatedCurve
 function updateCurve() {
     // turn off event listener so users can't click during animation
-    $(".globe-list2").off("click");
+    $(".body-list2").off("click");
     $(".bodypartListF").off("click");
     // determine the speed of the animation
     drawCount += 2;
@@ -471,9 +471,9 @@ function updateCurve() {
         // set drawCount to 0 in order for the animation in the next click
         drawCount = 0;
         // put event listener back after animation so users can click them again
-        $(".globe-list2").on("click", clickFn);
+        $(".body-list2").on("click", clickFn);
         $(".bodypartListF").on("click", clickFn);
-        $([$(".globe-canvas2"), $(".globe-list2"), $(".bodypartListF")]).each(function () {
+        $([$(".body-canvas2"), $(".body-list2"), $(".bodypartListF")]).each(function () {
             $(this).on('click', stopAutoRotation);
         });
         return;
@@ -546,7 +546,7 @@ function createListElements() {
     // Loop through each bodypart line
     var i = 0;
     for (var x = 0; x < allBodyPart2.length; x++) { //var bodypart in data.bodyparts
-        var coordinates = groups.globeDots.geometry.vertices[x];
+        var coordinates = groups.bodyDots.geometry.vertices[x];
         pushObject(coordinates, x);
     }
 }
@@ -555,9 +555,9 @@ function positionElements() { // place the label
     var widthHalf = canvas.clientWidth / 2;
     var heightHalf = canvas.clientHeight / 2;
     for (var key in elements) {
-        groups.globe.children[0].children[0].rotation.y += -0.00001;
+        groups.body.children[0].children[0].rotation.y += -0.00001;
         var targetElement = elements[key];
-        var position = getProjectedPosition(widthHalf, heightHalf, targetElement.position); //groups.globeDots.geometry.vertices replace last variable
+        var position = getProjectedPosition(widthHalf, heightHalf, targetElement.position); //groups.bodyDots.geometry.vertices replace last variable
         // Construct the X and Y position strings
         var positionX = position.x + 'px';
         var positionY = position.y + 'px';
@@ -579,10 +579,10 @@ var easeInOutCubic = function (t) {
 };
 
 
-// animation to place the points onto the globe when first loading the page
+// animation to place the points onto the body when first loading the page
 function introAnimate() {
     if (animations.dots.current <= animations.dots.total) {
-        var points = groups.globeDots.geometry.vertices;
+        var points = groups.bodyDots.geometry.vertices;
         var totalLength = points.length;
         for (var i = 0; i < totalLength; i++) {
 
@@ -603,7 +603,7 @@ function introAnimate() {
         animations.dots.current++;
 
         // Update verticies
-        groups.globeDots.geometry.verticesNeedUpdate = true;
+        groups.bodyDots.geometry.verticesNeedUpdate = true;
     }
 }
 
@@ -655,7 +655,7 @@ var clickFn = function (e) {
 
 
     //update color of the dots being clicked
-    $(".globe-list2 li").each(function () {
+    $(".body-list2 li").each(function () {
         if ($(this).attr('class') == clickedBodyPart) {
             $(this).css("background-color", "#eeff5d")
         } else {
@@ -719,7 +719,7 @@ stopAutoRotation = function () {
         clearTimeout(timeoutFn);
     }
     timeoutFn = setTimeout(function () {
-        camera.controls.autoRotate = true; //this is what allows rotation around the globe without DOM element positiong being lost
+        camera.controls.autoRotate = true; //this is what allows rotation around the body without DOM element positiong being lost
     }, 30000)
 }
 
@@ -743,9 +743,9 @@ var col5 = document.querySelector(".col-xl-5");
 var col7 = document.querySelector(".col-xl-7");
 var checkScreenSize = () => {
     var topGlow = document.getElementById('top-glow2');
-    var globeContainer = document.getElementsByClassName('js-globe2')[0];
-    var currentWidth = $("#globeContainer2").width();
-    var currentHeight = $("#globeContainer2").height();
+    var bodyContainer = document.getElementsByClassName('js-body2')[0];
+    var currentWidth = $("#bodyContainer2").width();
+    var currentHeight = $("#bodyContainer2").height();
 
     var width = window.innerWidth;
 

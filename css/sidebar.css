@@ -160,6 +160,7 @@ h2.accordion-toggle:after {
 }
 
 #phoneText {
+  color: black;
   font-size: 2em;
   padding: 25px;
 }
@@ -206,7 +207,7 @@ h2.accordion-toggle:after {
   }
 }
 
-/*---hide elements when screen is too small to display globe---*/
+/*---hide elements when screen is too small to display body---*/
 @media screen and (max-width: 650px) {
     #sidebar {display: none;}
     #logoContainer {display: none;}
