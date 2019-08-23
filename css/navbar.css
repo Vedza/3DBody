@@ -1,10 +1,5 @@
 /*-----bodypart list-----*/
 .bodypartContainer{
-  margin-top: 10px;
-  height: 72%;
-}
-
-.bodypartContainer2{
-    margin-top: 10px;
-    height: 72%;
+  margin-top: 0px;
+  height: 200%;
 }

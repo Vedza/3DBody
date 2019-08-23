@@ -1,0 +1,50 @@
+[
+  {
+    "name": "Arm",
+    "posX": "45",
+    "posY": "50",
+    "posZ": "0"
+  },
+  {
+    "name": "Bra folds",
+    "posX": "-25",
+    "posY": "45",
+    "posZ": "0"
+  },
+  {
+    "name": "Love handles",
+    "posX": "30",
+    "posY": "0",
+    "posZ": "10"
+  },
+  {
+    "name": "Saddle bags",
+    "posX": "-40",
+    "posY": "-60",
+    "posZ": "-15"
+  },
+  {
+    "name": "Calf",
+    "posX": "30",
+    "posY": "-185",
+    "posZ": "-25"
+  },
+  {
+    "name": "Chin",
+    "posX": "0",
+    "posY": "125",
+    "posZ": "25"
+  },
+  {
+    "name": "Abdomen",
+    "posX": "0",
+    "posY": "-20",
+    "posZ": "25"
+  },
+  {
+    "name": "Thighs interior",
+    "posX": "5",
+    "posY": "-100",
+    "posZ": "-7"
+  }
+]

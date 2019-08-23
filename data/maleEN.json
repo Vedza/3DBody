@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Chin",
+    "posX": "0",
+    "posY": "125",
+    "posZ": "30"
+  },
+  {
+    "name": "Pseudogynaecomastia",
+    "posX": "-20",
+    "posY": "70",
+    "posZ": "25"
+  },
+  {
+    "name": "Abdomen",
+    "posX": "0",
+    "posY": "10",
+    "posZ": "25"
+  },
+  {
+    "name": "Thighs",
+    "posX": "-25",
+    "posY": "-80",
+    "posZ": "15"
+  },
+  {
+    "name": "Knee",
+    "posX": "40",
+    "posY": "-150",
+    "posZ": "0"
+  },
+  {
+    "name": "Love handles",
+    "posX": "30",
+    "posY": "-10",
+    "posZ": "10"
+  }
+]

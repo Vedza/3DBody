@@ -3,43 +3,41 @@
     display: none;
 }
 
-.js #loader {
-    display: block;
-    position: absolute;
-    left: 100px;
-    top: 0;
-}
+/*.js #loader {*/
+/*    display: block;*/
+/*    position: absolute;*/
+/*    left: 100px;*/
+/*    top: 0;*/
+/*}*/
 
-.se-pre-con {
-    position: fixed;
-    left: 0px;
-    top: 0px;
-    width: 100%;
-    height: 100%;
-    z-index: 9999;
-}
-
-
+/*.se-pre-con {*/
+/*    position: fixed;*/
+/*    left: 0px;*/
+/*    top: 0px;*/
+/*    width: 100%;*/
+/*    height: 100%;*/
+/*    z-index: 9999;*/
+/*}*/
 
 /*------------------------*/
 
 /*---body container and list---*/
-.js-body {
-    position: relative;
-    margin: auto;
-    height: inherit;
-    z-index: 33;
-}
+/*.js-body {*/
+/*    position: relative;*/
+/*    margin: auto;*/
+/*    height: inherit;*/
+/*    z-index: 33;*/
+/*}*/
 
 
 #top-glow {
-    position: absolute;
-    top: calc(-4% - 10px);
-    right: 0;
-    z-index: -1;
-    background-size: 63%;
-    background-repeat: no-repeat;
-    background-position: center;
+    /*position: absolute;*/
+    /*top: calc(-4% - 10px);*/
+    /*right: 0;*/
+    /*z-index: -1;*/
+    /*background-size: 63%;*/
+    /*background-repeat: no-repeat;*/
+    /*background-position: center;*/
 }
 
 .js-canvas {
@@ -48,48 +46,47 @@
     cursor: grab;
 }
 
+canvas {
+    margin-left: -200px;
+    margin-top: -120px;
+
+    height: 700px;
+}
+
 .js-list {
     list-style-type: none;
     margin: 0;
 }
 
-.js-list li:hover {
-    background: #d5cccc !important;
-    /*cursor: pointer;*/
-}
+/*.js-list li:hover {*/
+/*    background: #d5cccc !important;*/
+/*    !*cursor: pointer;*!*/
+/*}*/
 
 .body .body-list > li {
     opacity: 1;
-
+    margin-left: -220px;
+    margin-top: -133px;
     position: absolute;
-    margin-left: -25px;
-    margin-top: -9px;
-    width: 14px;
-    height: 14px;
+    margin-right: 100px;
     list-style-image: url('../img/dots.png');
+    width: 100px;
+    height: 25px;
 
     z-index: 51;
 }
 
-.body .body-list > li:before {
-    content: "";
-    opacity: 0.5;
-    pointer-events: none;
-    margin-left: -8px;
-    margin-top: -8px;
-    width: 16px;
-    height: 16px;
-    z-index: 52;
-}
 
 /*bodypart text*/
 .body .body-list .text {
     position: absolute;
     opacity: 1;
-    top: 50%;
-
+    top: 22%;
+    margin-right: 200px;
+    color: #333333;
     display: block;
-    font-size: 13px;
+    font-size: 17px;
+    font-family:"Roboto";
 
     text-align: right;
     white-space: nowrap;
@@ -98,89 +95,14 @@
     height: 16px;
     padding: 2px;
 }
-/*---body container and list---*/
-.js-body2 {
-    position: relative;
-    margin: auto;
-    height: inherit;
-    z-index: 33;
-}
 
-
-#top-glow2 {
-    position: absolute;
-    top: calc(-4% - 10px);
-    right: 0;
-    z-index: -1;
-    background-size: 63%;
-    background-repeat: no-repeat;
-    background-position: center;
-}
-
-.js-canvas2 {
-    z-index: 0;
-    cursor: move; /* fallback if grab cursor is unsupported */
-    cursor: grab;
-}
-
-.js-list2 {
-    list-style-type: none;
-    margin: 0;
-}
-
-.js-list2 li:hover {
-    background: #d5cccc !important;
-    /*cursor: pointer;*/
-}
-
-.body2 .body-list2 > li {
-    opacity: 1;
-
-    position: absolute;
-    margin-left: -25px;
-    margin-top: -9px;
-    width: 14px;
-    height: 14px;
-    list-style-image: url('../img/dots.png');
-
-    z-index: 51;
-}
-
-.body2 .body-list2 > li:before {
-    content: "";
-    opacity: 0.5;
-    pointer-events: none;
-    margin-left: -8px;
-    margin-top: -8px;
-    width: 16px;
-    height: 16px;
-    z-index: 52;
-}
-
-/*bodypart text*/
-.body2 .body-list2 .text {
-    position: absolute;
-    opacity: 1;
-    top: 50%;
-
-    display: block;
-    font-size: 13px;
-    line-height: 9px;
-    text-align: right;
-    white-space: nowrap;
-    transform: translateY(-50%);
-    width: auto;
-    height: 16px;
-    padding: 2px;
-}
-
-/*------------------------*/
 /*---hide body when screen is too small*/
-@media screen and (max-width: 650px) {
-    .body {
-        display: none;
-    }
-    .body2 {
-        display: none;
-    }
-}
+/*@media screen and (max-width: 650px) {*/
+/*    .body {*/
+/*        display: none;*/
+/*    }*/
+
+/*    .body {*/
+/*        display: none;*/
+/*    }*/
+/*}*/
