@@ -1,8 +1,7 @@
 ;
 
 function putFemale() {
-    // Built by Qi Shu and Kieran Hillier aka Team Cali
-
+    
 // for pre-loading
     $(window).on("load", function () {
         // Animate loader off screen
