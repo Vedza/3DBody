@@ -2,8 +2,8 @@
 
 
 * Interactive 3D human body built based on Three.js and WebGL
-* CSS-based 3D locations points to follow Earth movement
+* CSS-based 3D locations points to follow body movement
 * Body rotating to make points clicked always facing the user
 
 ## Screenshot:
-![alt text]()
+![](gif.gif)
